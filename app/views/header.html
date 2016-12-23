@@ -38,6 +38,11 @@
                     <span class="glyphicon glyphicon-log-in"></span> Logout</a>
                     </li>
                 </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li ng-if="!loggedIn || isAdmin"><a ng-click="openRegister()">
+                    <span class="glyphicon glyphicon-plus-sign"></span> Register</a>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>         

@@ -21,6 +21,12 @@
                     <label class="sr-only" for="lastname">Last Name</label>
                     <input type="text" class="form-control input-sm" id="lastname" placeholder="Last Name" ng-model="registration.lastname">
                 </div>
+				<div class="checkbox" ng-if="isAdmin">
+                    <label>
+                        <input type="checkbox" ng-model="registration.registerAdmin"> Is Admin
+                    </label>
+                </div>
+
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" ng-model="registration.rememberMe"> Remember me

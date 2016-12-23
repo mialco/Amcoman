@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('confusionApp')
-.constant("baseURL", "https://localhost:3443/")
+.constant("baseURL", "http://localhost:3022/")
 .factory('menuFactory', ['$resource', 'baseURL', function ($resource, baseURL) {
 
         return $resource(baseURL + "dishes/:id", null, {
@@ -93,6 +93,7 @@ angular.module('confusionApp')
     var TOKEN_KEY = 'Token';
     var isAuthenticated = false;
     var username = '';
+	var isAdmin = false;
     var authToken = undefined;
     
 
@@ -112,6 +113,7 @@ angular.module('confusionApp')
     isAuthenticated = true;
     username = credentials.username;
     authToken = credentials.token;
+	isAdmin = credentials.admin;
  
     // Set the token as header for your requests!
     $http.defaults.headers.common['x-access-token'] = authToken;
@@ -121,6 +123,7 @@ angular.module('confusionApp')
     authToken = undefined;
     username = '';
     isAuthenticated = false;
+	isAdmin = false;
     $http.defaults.headers.common['x-access-token'] = authToken;
     $localStorage.remove(TOKEN_KEY);
   }
@@ -130,7 +133,7 @@ angular.module('confusionApp')
         $resource(baseURL + "users/login")
         .save(loginData,
            function(response) {
-              storeUserCredentials({username:loginData.username, token: response.token});
+              storeUserCredentials({username:loginData.username, token: response.token, admin: response.admin});
               $rootScope.$broadcast('login:Successful');
            },
            function(response){
@@ -163,7 +166,7 @@ angular.module('confusionApp')
         $resource(baseURL + "users/register")
         .save(registerData,
            function(response) {
-              authFac.login({username:registerData.username, password:registerData.password});
+              authFac.login({username:registerData.username, password:registerData.password, admin: admin});
             if (registerData.rememberMe) {
                 $localStorage.storeObject('userinfo',
                     {username:registerData.username, password:registerData.password});
@@ -192,6 +195,10 @@ angular.module('confusionApp')
     
     authFac.getUsername = function() {
         return username;  
+    };
+
+    authFac.isAdmin = function() {
+        return isAdmin;  
     };
 
     loadUserCredentials();

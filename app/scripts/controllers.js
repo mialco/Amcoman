@@ -245,10 +245,12 @@ angular.module('confusionApp')
 
     $scope.loggedIn = false;
     $scope.username = '';
+	$scope.isAdmin =false;
     
     if(AuthFactory.isAuthenticated()) {
         $scope.loggedIn = true;
         $scope.username = AuthFactory.getUsername();
+		$scope.isAdmin = AuthFactory.isAdmin();
     }
         
     $scope.openLogin = function () {
@@ -259,22 +261,28 @@ angular.module('confusionApp')
        AuthFactory.logout();
         $scope.loggedIn = false;
         $scope.username = '';
+		$scope.isAdmin = false;
     };
     
     $rootScope.$on('login:Successful', function () {
         $scope.loggedIn = AuthFactory.isAuthenticated();
         $scope.username = AuthFactory.getUsername();
+		$scope.isAdmin=AuthFactory.isAdmin();
     });
         
     $rootScope.$on('registration:Successful', function () {
         $scope.loggedIn = AuthFactory.isAuthenticated();
         $scope.username = AuthFactory.getUsername();
+		$scope.isAdmin=AuthFactory.isAdmin();
     });
     
     $scope.stateis = function(curstate) {
        return $state.is(curstate);  
     };
     
+    $scope.openRegister = function () {
+        ngDialog.open({ template: 'views/register.html', scope: $scope, className: 'ngdialog-theme-default', controller:"RegisterController" });
+    };
 }])
 
 .controller('LoginController', ['$scope', 'ngDialog', '$localStorage', 'AuthFactory', function ($scope, ngDialog, $localStorage, AuthFactory) {
@@ -301,10 +309,14 @@ angular.module('confusionApp')
     
     $scope.register={};
     $scope.loginData={};
-    
+	$scope.isCurrentUserAdmin = AuthFactory.isAdmin();
+    $scope.companies = {};
+	$scope.admin = false;
     $scope.doRegister = function() {
         console.log('Doing registration', $scope.registration);
-
+		if (typeof($scope.registration) === "undefined") {
+			$scope.registration = false;
+			}
         AuthFactory.register($scope.registration);
         
         ngDialog.close();
