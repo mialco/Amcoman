@@ -68,6 +68,39 @@ angular.module('confusionApp', ['ui.router','ngResource','ngDialog'])
             })
         
             // route for the dishdetail page
+            .state('app.orgs', {
+                url: 'admin/orgs',
+                views: {
+                    'content@': {
+                        templateUrl : 'views/organizations.html',
+                        controller  : 'OrganizationController'
+                   }
+                }
+            })
+
+            // route for the dishdetail page
+            .state('app.entities', {
+                url: 'admin/entities',
+                views: {
+                    'content@': {
+                        templateUrl : 'views/entities.html',
+                        controller  : 'EntityController'
+                   }
+                }
+            })
+
+            // route for the dishdetail page
+            .state('app.articles', {
+                url: 'admin/articles',
+                views: {
+                    'content@': {
+                        templateUrl : 'views/articles.html',
+                        controller  : 'ArticleController'
+                   }
+                }
+            })
+
+            // route for the dishdetail page
             .state('app.favorites', {
                 url: 'favorites',
                 views: {

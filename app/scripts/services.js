@@ -206,4 +206,48 @@ angular.module('confusionApp')
     return authFac;
     
 }])
+.factory('OrgFactory', ['$resource', '$http', '$localStorage', '$rootScope', '$window', 'baseURL', 'ngDialog', function($resource, $http, $localStorage, $rootScope, $window, baseURL, ngDialog){
+	
+
+	return $resource(baseURL + "orgs", null, {
+        'update': {
+            method: 'PUT'
+        },
+		'query':  {method:'GET', isArray:true},
+		'save' : {method: 'POST'}
+    });
+	
+	
+}])
+.factory('EntityFactory', ['$resource', '$http', '$localStorage', '$rootScope', '$window', 'baseURL', 'ngDialog', function($resource, $http, $localStorage, $rootScope, $window, baseURL, ngDialog){
+	
+	var entFac ={};
+	entFac.entities=$resource(baseURL + "entities", null, {
+        'update': {
+            method: 'PUT'
+        },
+		'query':  {method:'GET', isArray:true},
+		'save' : {method: 'POST'}
+    });
+	
+	
+	
+	return entFac;
+}])
+.factory('ArticleFactory', ['$resource', '$http', '$localStorage', '$rootScope', '$window', 'baseURL', 'ngDialog', function($resource, $http, $localStorage, $rootScope, $window, baseURL, ngDialog){
+	
+	var artFac ={};
+	artFac.articles=$resource(baseURL + "articles/:artId", {artId: '@artId'}, {
+        'update': {
+            method: 'PUT'
+        },
+		'query':  {method:'GET', isArray:true},
+		'save' : {method: 'POST'}
+    });
+	
+	
+	
+	return artFac;
+}])
+
 ;
