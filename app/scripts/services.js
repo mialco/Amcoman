@@ -2,6 +2,7 @@
 
 angular.module('confusionApp')
 .constant("baseURL", "http://localhost:3022/")
+//.constant("baseURL", "https://amcoman.mybluemix.net/")
 .factory('menuFactory', ['$resource', 'baseURL', function ($resource, baseURL) {
 
         return $resource(baseURL + "dishes/:id", null, {
@@ -18,40 +19,6 @@ angular.module('confusionApp')
             'update': {
                 method: 'PUT'
             }
-        });
-
-}])
-
-.factory('promotionFactory', ['$resource', 'baseURL', function ($resource, baseURL) {
-
-    return $resource(baseURL + "promotions/:id", null, {
-            'update': {
-                method: 'PUT'
-            }
-        });
-
-}])
-
-.factory('corporateFactory', ['$resource', 'baseURL', function ($resource, baseURL) {
-
-
-    return $resource(baseURL + "leadership/:id", null, {
-            'update': {
-                method: 'PUT'
-            }
-        });
-
-}])
-
-
-.factory('favoriteFactory', ['$resource', 'baseURL', function ($resource, baseURL) {
-
-
-    return $resource(baseURL + "favorites/:id", null, {
-            'update': {
-                method: 'PUT'
-            },
-            'query':  {method:'GET', isArray:false}
         });
 
 }])
@@ -84,7 +51,7 @@ angular.module('confusionApp')
         getObject: function (key, defaultValue) {
             return JSON.parse($window.localStorage[key] || defaultValue);
         }
-    }
+    };
 }])
 
 .factory('AuthFactory', ['$resource', '$http', '$localStorage', '$rootScope', '$window', 'baseURL', 'ngDialog', function($resource, $http, $localStorage, $rootScope, $window, baseURL, ngDialog){
@@ -94,12 +61,12 @@ angular.module('confusionApp')
     var isAuthenticated = false;
     var username = '';
 	var isAdmin = false;
-    var authToken = undefined;
+    var authToken;
     
 
   function loadUserCredentials() {
     var credentials = $localStorage.getObject(TOKEN_KEY,'{}');
-    if (credentials.username != undefined) {
+    if (credentials.username !== undefined) {
       useCredentials(credentials);
     }
   }
@@ -146,7 +113,7 @@ angular.module('confusionApp')
                     response.data.err.name + '</p></div>' +
                 '<div class="ngdialog-buttons">\
                     <button type="button" class="ngdialog-button ngdialog-button-primary" ng-click=confirm("OK")>OK</button>\
-                </div>'
+                </div>';
             
                 ngDialog.openConfirm({ template: message, plain: 'true'});
            }
@@ -209,12 +176,12 @@ angular.module('confusionApp')
 .factory('OrgFactory', ['$resource', '$http', '$localStorage', '$rootScope', '$window', 'baseURL', 'ngDialog', function($resource, $http, $localStorage, $rootScope, $window, baseURL, ngDialog){
 	
 
-	return $resource(baseURL + "orgs", null, {
-        'update': {
-            method: 'PUT'
-        },
-		'query':  {method:'GET', isArray:true},
+	return $resource(baseURL + "orgs/:orgId", {orgId: '@orgId'}, {
+        'update': { method: 'PUT' },
+        'query': { method: 'GET', isArray: true },
+        'getOne': { method: 'GET', isArray: false },
 		'save' : {method: 'POST'}
+		
     });
 	
 	
@@ -234,13 +201,12 @@ angular.module('confusionApp')
 	
 	return entFac;
 }])
+
 .factory('ArticleFactory', ['$resource', '$http', '$localStorage', '$rootScope', '$window', 'baseURL', 'ngDialog', function($resource, $http, $localStorage, $rootScope, $window, baseURL, ngDialog){
 	
 	var artFac ={};
 	artFac.articles=$resource(baseURL + "articles/:artId", {artId: '@artId'}, {
-        'update': {
-            method: 'PUT'
-        },
+        'update': {method: 'PUT'},
 		'query':  {method:'GET', isArray:true},
 		'save' : {method: 'POST'}
     });

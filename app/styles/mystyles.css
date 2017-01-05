@@ -9,6 +9,13 @@
   min-height: 20px;
 }
 
+.row-content-tall {
+  margin: 0px auto;
+  padding: 10px 0px;
+  border-bottom: 1px ridge;
+  min-height: 400px;
+}
+
 .row-footer {
   margin: 0px auto;
   padding: 20px 0px;

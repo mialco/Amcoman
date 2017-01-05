@@ -46,10 +46,10 @@ angular.module('confusionApp')
     $scope.toggleFavorites = function () {
         $scope.showFavorites = !$scope.showFavorites;
     };
-    
-    $scope.addToFavorites = function(dishid) {
+
+    $scope.addToFavorites = function (dishid) {
         console.log('Add to favorites', dishid);
-        favoriteFactory.save({_id: dishid});
+        favoriteFactory.save({ _id: dishid });
         $scope.showFavorites = !$scope.showFavorites;
     };
 }])
@@ -103,8 +103,8 @@ angular.module('confusionApp')
     $scope.message = "Loading ...";
 
     $scope.dish = menuFactory.get({
-            id: $stateParams.id
-        })
+        id: $stateParams.id
+    })
         .$promise.then(
             function (response) {
                 $scope.dish = response;
@@ -122,10 +122,10 @@ angular.module('confusionApp')
 
     $scope.submitComment = function () {
 
-        commentFactory.save({id: $stateParams.id}, $scope.mycomment);
+        commentFactory.save({ id: $stateParams.id }, $scope.mycomment);
 
-        $state.go($state.current, {}, {reload: true});
-        
+        $state.go($state.current, {}, { reload: true });
+
         $scope.commentForm.$setPristine();
 
         $scope.mycomment = {
@@ -137,53 +137,14 @@ angular.module('confusionApp')
 
 // implement the IndexController and About Controller here
 
-.controller('HomeController', ['$scope', 'menuFactory', 'corporateFactory', 'promotionFactory', function ($scope, menuFactory, corporateFactory, promotionFactory) {
+.controller('HomeController', ['$scope', 'menuFactory', function ($scope, menuFactory, promotionFactory) {
     $scope.showDish = false;
     $scope.showLeader = false;
     $scope.showPromotion = false;
     $scope.message = "Loading ...";
-    // var leaders = corporateFactory.query({
-            // featured: "true"
-        // })
-        // .$promise.then(
-            // function (response) {
-                // var leaders = response;
-                // $scope.leader = leaders[0];
-                // $scope.showLeader = true;
-            // },
-            // function (response) {
-                // $scope.message = "Error: " + response.status + " " + response.statusText;
-            // }
-        // );
-    // $scope.dish = menuFactory.query({
-            // featured: "true"
-        // })
-        // .$promise.then(
-            // function (response) {
-                // var dishes = response;
-                // $scope.dish = dishes[0];
-                // $scope.showDish = true;
-            // },
-            // function (response) {
-                // $scope.message = "Error: " + response.status + " " + response.statusText;
-            // }
-        // );
-    // var promotions = promotionFactory.query({
-        // featured: "true"
-    // })
-    // .$promise.then(
-            // function (response) {
-                // var promotions = response;
-                // $scope.promotion = promotions[0];
-                // $scope.showPromotion = true;
-            // },
-            // function (response) {
-                // $scope.message = "Error: " + response.status + " " + response.statusText;
-            // }
-        // );
 }])
 
-.controller('AboutController', ['$scope', 'corporateFactory', function ($scope, corporateFactory) {
+.controller('AboutController', ['$scope', function ($scope) {
 
     $scope.leaders = {};
 
@@ -232,12 +193,12 @@ angular.module('confusionApp')
     $scope.toggleDelete = function () {
         $scope.showDelete = !$scope.showDelete;
     };
-    
-    $scope.deleteFavorite = function(dishid) {
+
+    $scope.deleteFavorite = function (dishid) {
         console.log('Delete favorites', dishid);
-        favoriteFactory.delete({id: dishid});
+        favoriteFactory.delete({ id: dishid });
         $scope.showDelete = !$scope.showDelete;
-        $state.go($state.current, {}, {reload: true});
+        $state.go($state.current, {}, { reload: true });
     };
 }])
 
@@ -245,335 +206,512 @@ angular.module('confusionApp')
 
     $scope.loggedIn = false;
     $scope.username = '';
-	$scope.isAdmin =false;
-    
-    if(AuthFactory.isAuthenticated()) {
+    $scope.isAdmin = false;
+
+    if (AuthFactory.isAuthenticated()) {
         $scope.loggedIn = true;
         $scope.username = AuthFactory.getUsername();
-		$scope.isAdmin = AuthFactory.isAdmin();
+        $scope.isAdmin = AuthFactory.isAdmin();
     }
-        
+
     $scope.openLogin = function () {
-        ngDialog.open({ template: 'views/login.html', scope: $scope, className: 'ngdialog-theme-default', controller:"LoginController" });
+        ngDialog.open({ template: 'views/login.html', scope: $scope, className: 'ngdialog-theme-default', controller: "LoginController" });
     };
-    
-    $scope.logOut = function() {
-       AuthFactory.logout();
+
+    $scope.logOut = function () {
+        AuthFactory.logout();
         $scope.loggedIn = false;
         $scope.username = '';
-		$scope.isAdmin = false;
+        $scope.isAdmin = false;
     };
-    
+
     $rootScope.$on('login:Successful', function () {
         $scope.loggedIn = AuthFactory.isAuthenticated();
         $scope.username = AuthFactory.getUsername();
-		$scope.isAdmin=AuthFactory.isAdmin();
+        $scope.isAdmin = AuthFactory.isAdmin();
     });
-        
+
     $rootScope.$on('registration:Successful', function () {
         $scope.loggedIn = AuthFactory.isAuthenticated();
         $scope.username = AuthFactory.getUsername();
-		$scope.isAdmin=AuthFactory.isAdmin();
+        $scope.isAdmin = AuthFactory.isAdmin();
     });
-    
-    $scope.stateis = function(curstate) {
-       return $state.is(curstate);  
+
+    $scope.stateis = function (curstate) {
+        return $state.is(curstate);
     };
-    
+
     $scope.openRegister = function () {
-        ngDialog.open({ template: 'views/register.html', scope: $scope, className: 'ngdialog-theme-default', controller:"RegisterController" });
+        ngDialog.open({ template: 'views/register.html', scope: $scope, className: 'ngdialog-theme-default', controller: "RegisterController" });
     };
 }])
 
 .controller('LoginController', ['$scope', 'ngDialog', '$localStorage', 'AuthFactory', function ($scope, ngDialog, $localStorage, AuthFactory) {
-    
-    $scope.loginData = $localStorage.getObject('userinfo','{}');
-    
-    $scope.doLogin = function() {
-        if($scope.rememberMe)
-           $localStorage.storeObject('userinfo',$scope.loginData);
+
+    $scope.loginData = $localStorage.getObject('userinfo', '{}');
+
+    $scope.doLogin = function () {
+        if ($scope.rememberMe)
+            $localStorage.storeObject('userinfo', $scope.loginData);
 
         AuthFactory.login($scope.loginData);
 
         ngDialog.close();
 
     };
-            
+
     $scope.openRegister = function () {
-        ngDialog.open({ template: 'views/register.html', scope: $scope, className: 'ngdialog-theme-default', controller:"RegisterController" });
+        ngDialog.open({ template: 'views/register.html', scope: $scope, className: 'ngdialog-theme-default', controller: "RegisterController" });
     };
-    
+
 }])
 
 .controller('RegisterController', ['$scope', 'ngDialog', '$localStorage', 'AuthFactory', function ($scope, ngDialog, $localStorage, AuthFactory) {
-    
-    $scope.register={};
-    $scope.loginData={};
-	$scope.isCurrentUserAdmin = AuthFactory.isAdmin();
+
+    $scope.register = {};
+    $scope.loginData = {};
+    $scope.isCurrentUserAdmin = AuthFactory.isAdmin();
     $scope.companies = {};
-	$scope.admin = false;
-    $scope.doRegister = function() {
+    $scope.admin = false;
+    $scope.doRegister = function () {
         console.log('Doing registration', $scope.registration);
-		if (typeof($scope.registration) === "undefined") {
-			$scope.registration = false;
-			}
+        if (typeof ($scope.registration) === "undefined") {
+            $scope.registration = false;
+        }
         AuthFactory.register($scope.registration);
-        
+
         ngDialog.close();
 
     };
 }])
 .controller('OrganizationController', ['$scope', 'ngDialog', '$localStorage', 'OrgFactory', function ($scope, ngDialog, $localStorage, OrgFactory) {
-	$scope.orgs = {};
-	$scope.addNewFormIsVisible = false;
-	$scope.processMessage  = '';
-	$scope.showProcessMessage = false;
-	$scope.newOrg = {organizationName : '', contactName: '',  contactEmail: '', contactPhone: '' };
-	OrgFactory.query( 
-	function (response){
-		$scope.showProcessMessage = false;
-		$scope.orgs=response;
+    $scope.orgs = {};
+    $scope.addNewFormIsVisible = false;
+    $scope.processMessage = '';
+    $scope.showProcessMessage = false;
+    $scope.newOrg = { organizationName: '', contactName: '', contactEmail: '', contactPhone: '' };
+    $scope.orgSelected = {};
+
+    OrgFactory.query(
+	function (response) {
+	    $scope.showProcessMessage = false;
+	    $scope.orgs = response;
+	    resetLinesProps($scope.orgs);
 	},
-	function(response){
-		console.log('Error found in controller while retrieving the organizations ');		
-		$scope.processMessage = response.data;
-		$scope.showProcessMessage = true;
+	function (response) {
+	    console.log('Error found in controller while retrieving the organizations ');
+	    $scope.processMessage = response.data;
+	    $scope.showProcessMessage = true;
 	}
 	);
-	
-	$scope.showAddNewForm = function(isVisible){
-		$scope.showProcessMessage = false;
-		$scope.addNewFormIsVisible = isVisible;
-	}
-	
-	$scope.addNewOrg = function(){		
-		$scope.processMessage  = '';
-		$scope.showProcessMessage = false;
-		OrgFactory.save($scope.newOrg, 
-			function (response){
-				console.log('new organization Created id:' + 'response._id');
-				OrgFactory.query( 
-				function (response){
-					$scope.orgs=response;
+
+    $scope.showAddNewForm = function (isVisible) {
+        $scope.showProcessMessage = false;
+        $scope.addNewFormIsVisible = isVisible;
+    }
+
+    $scope.addNewOrg = function () {
+        $scope.processMessage = '';
+        $scope.showProcessMessage = false;
+
+        OrgFactory.save($scope.newOrg,
+			function (response) {
+			    console.log('new organization Created id:' + 'response._id');
+			    OrgFactory.query(
+				function (response) {
+				    $scope.orgs = response;
+				    resetLinesProps($scope.orgs);
 				},
-				function(response){
-					console.log('Error found in controller while retrieving the organizations ');
+				function (response) {
+				    console.log('Error found in controller while retrieving the organizations ');
 				}
 				);
 			},
-			function (response){
-				console.log('failed to create new organization' );
+			function (response) {
+			    console.log('failed to create new organization');
 			}
 		);
-		$scope.addNewFormIsVisible = false;
-		$scope.newOrg = {organizationName : '', contactName: '',  contactEmail: '', contactPhone: '' }
-	}
-	
-	$scope.cancelAddNew= function(){
-		$scope.processMessage  = '';
-		$scope.showProcessMessage = false;
-		$scope.addNewFormIsVisible = false;
-		$scope.newOrg = {organizationName : '', contactName: '',  contactEmail: '', contactPhone: '' }
-	}
+        $scope.addNewFormIsVisible = false;
+        $scope.newOrg = { organizationName: '', contactName: '', contactEmail: '', contactPhone: '' }
+    };
+
+    $scope.cancelAddNew = function () {
+        $scope.processMessage = '';
+        $scope.showProcessMessage = false;
+        $scope.addNewFormIsVisible = false;
+        $scope.newOrg = { organizationName: '', contactName: '', contactEmail: '', contactPhone: '' }
+    };
+
+    $scope.deleteOrg = function (orgId) {
+        $scope.processMessage = 'Deleting organization';
+        $scope.showProcessMessage = true;
+        OrgFactory.delete({ 'orgId': orgId },
+			function (response) {
+			    console.log('Organization Deleted id:' + 'response._id');
+			    OrgFactory.query(
+				function (response) {
+				    $scope.orgs = response;
+				    resetLinesProps($scope.orgs);
+				    $scope.processMessage = '';
+				    $scope.showProcessMessage = false;
+				},
+				function (response) {
+				    console.log('Error found in controller while deleting the organization ');
+				    $scope.processMessage = 'Error found in controller while deleting the organization ';
+				    $scope.showProcessMessage = true;
+				});
+			},
+			function (response) {
+			    console.log('failed to delete organization');
+			    $scope.processMessage = 'failed to delete organization  ';
+			    $scope.showProcessMessage = true;
+			})
+    };
+
+    $scope.editOrg = function (org) {
+        $scope.showProcessMessage = false;
+        var lineId = 0;
+        if (org) lineId = org.lineId | 0;
+        if ($scope.orgs && Array.isArray($scope.orgs) && $scope.orgs.length > 0) {
+            if (lineId >= 0 && lineId < $scope.orgs.length) {
+                for (var j = 0; j < $scope.orgs.length; j++) {
+                    $scope.orgs[j].edit = j === lineId;
+                }
+            }
+        }
+    };
+
+    $scope.saveEditedOrg = function (orgId, lineId) {
+        $scope.processMessage = 'Saving change to orgicle: ';
+        $scope.showProcessMessage = true;
+        var org = $scope.orgs[lineId];
+        OrgFactory.update({ orgId: orgId, organizationName: org.organizationName, contactName: org.contactName, contactEmail: org.contactEmail, contatPhone: org.contactPhone },
+			function (response) {
+			    console.log('Organation Saved -  id:' + 'response._id');
+			    $scope.showProcessMessage = false;
+			    $scope.processMessage = '';
+			},
+			function (response) {
+			    console.log('failed to save Changes to  organization  ');
+			    $scope.processMessage = 'failed to save change to organization ';
+			    $scope.showProcessMessage = true;
+			})
+
+        $scope.orgs[lineId].edit = false;
+    };
+
+    $scope.cancelEditOrg = function (lineId) {
+        $scope.orgs[lineId].edit = false;
+    };
+
+    function resetLinesProps(items) {
+        if (items && Array.isArray(items) && items.length > 0) {
+            for (var j = 0; j < items.length; j++) {
+                items[j].edit = false;
+                items[j].lineId = j;
+                items[j].entitiesCount = 0;
+                if (Array.isArray(items[j].entities)) {
+                    items[j].entitiesCount = items[j].entities.length;
+                }
+            }
+        }
+    }
+
+}])
+.controller('OrganizationDetailController', ['$scope', '$stateParams', 'ngDialog', '$localStorage', 'OrgFactory', function ($scope, $stateParams, ngDialog, $localStorage, OrgFactory) {
+    $scope.org = {};
+    $scope.addNewFormIsVisible = false;
+    $scope.editCurrent = false;
+    $scope.processMessage = '';
+    $scope.showProcessMessage = false;
+    $scope.newOrg = {};
+    $scope.selectedOrgId = $stateParams.orgId;
+
+    resetNewOrg();
+
+    //Getting the organuization from the server
+    OrgFactory.getOne({ orgId: $scope.selectedOrgId },
+	function (response) {
+	    $scope.showProcessMessage = false;
+	    $scope.org = response;
+	},
+	function (response) {
+	    console.log('Error found in controller while retrieving the organizations ');
+	    $scope.processMessage = response.data;
+	    $scope.showProcessMessage = true;
+	});
+
+    $scope.showAddNewForm = function (isVisible, editMode) {
+        $scope.showProcessMessage = false;
+        $scope.addNewFormIsVisible = isVisible;
+        $scope.editCurrent = editMode | false;
+        if ($scope.editCurrent) {
+            $scope.newOrg = $scope.org;
+        } else {
+            resetNewOrg();
+        }
+    };
+
+    $scope.addNewOrg = function () {
+        $scope.processMessage = '';
+        $scope.showProcessMessage = false;
+
+        if ($scope.editCurrent) {
+            $scope.editCurrent = false;
+            $scope.saveCurrentOrg();
+        } else {
+            OrgFactory.save($scope.newOrg,
+                function (response) {
+                    console.log('new organization Created id:' + 'response._id');
+                    $scope.org = response;
+                },
+                function (response) {
+                    console.log('failed to create new organization');
+                }
+            );
+        }
+        $scope.addNewFormIsVisible = false;        
+    };
+
+    $scope.cancelAddNew = function () {
+        $scope.processMessage = '';
+        $scope.showProcessMessage = false;
+        $scope.addNewFormIsVisible = false;
+        $scope.editCurrent = false;
+        resetNewOrg();
+    };
+
+    $scope.editOrg = function (org) {
+        $scope.showProcessMessage = false;
+        $scope.editCurrent = true;
+        $scope.newOrg = $scope.org;
+    };
+
+    $scope.saveCurrentOrg = function () {
+        $scope.processMessage = 'Saving change to organization: ';
+        $scope.showProcessMessage = true;
+        var org = $scope.org;
+        OrgFactory.update({ orgId: org._id, organizationName: org.organizationName, contactName: org.contactName, contactEmail: org.contactEmail, contactPhone: org.contactPhone },
+			function (response) {
+			    console.log('Organization Saved -  id:' + 'response._id');
+			    $scope.showProcessMessage = false;
+			    $scope.processMessage = '';
+			    $scope.editCurrent = false;
+			    $scope.addNewFormIsVisible = false;
+			    resetNewOrg();
+			},
+			function (response) {
+			    console.log('Organization Details form failed to save Changes to  organization  ');
+			    $scope.processMessage = 'failed to save change to organization ';
+			    $scope.showProcessMessage = true;
+			});
+    };
+
+    //$scope.cancelEditOrg = function (lineId) {
+    //    $scope.orgs[lineId].edit = false;
+    //};
+
+    function resetNewOrg() {
+        $scope.newOrg = { organizationName: '', contactName: '', contactEmail: '', contactPhone: '' }
+    }
+
 }])
 .controller('EntityController', ['$scope', 'ngDialog', '$localStorage', 'EntityFactory', function ($scope, ngDialog, $localStorage, EntityFactory) {
-	$scope.ents = {};
-	$scope.addNewFormIsVisible = false;
-	$scope.processMessage  = '';
-	$scope.showProcessMessage = false;
-	$scope.newEnt = {name : '', url: '',  description: ''};
-	
-	EntityFactory.entities.query( 
-	function (response){
-		$scope.showProcessMessage = false;
-		$scope.ents=response;
+    $scope.ents = {};
+    $scope.addNewFormIsVisible = false;
+    $scope.processMessage = '';
+    $scope.showProcessMessage = false;
+    $scope.newEnt = { name: '', url: '', description: '' };
+
+    EntityFactory.entities.query(
+	function (response) {
+	    $scope.showProcessMessage = false;
+	    $scope.ents = response;
 	},
-	function(response){
-		console.log('Error found in controller while retrieving the entities ');		
-		$scope.processMessage = response.data;
-		$scope.showProcessMessage = true;
+	function (response) {
+	    console.log('Error found in controller while retrieving the entities ');
+	    $scope.processMessage = response.data;
+	    $scope.showProcessMessage = true;
 	}
 	);
-	
-	$scope.showAddNewForm = function(isVisible){
-		$scope.showProcessMessage = false;
-		$scope.addNewFormIsVisible = isVisible;
-	}
-	
-	$scope.addNewEntity = function(){		
-		$scope.processMessage  = '';
-		$scope.showProcessMessage = false;
-		EntityFactory.entities.save($scope.newEnt, 
-			function (response){
-				console.log('new Entity Created id:' + 'response._id');
-				EntityFactory.entities.query( 
-				function (response){
-					$scope.ents=response;
+
+    $scope.showAddNewForm = function (isVisible) {
+        $scope.showProcessMessage = false;
+        $scope.addNewFormIsVisible = isVisible;
+    }
+
+    $scope.addNewEntity = function () {
+        $scope.processMessage = '';
+        $scope.showProcessMessage = false;
+        EntityFactory.entities.save($scope.newEnt,
+			function (response) {
+			    console.log('new Entity Created id:' + 'response._id');
+			    EntityFactory.entities.query(
+				function (response) {
+				    $scope.ents = response;
 				},
-				function(response){
-					console.log('Error found in controller while retrieving the entities ');
+				function (response) {
+				    console.log('Error found in controller while retrieving the entities ');
 				}
 				);
 			},
-			function (response){
-				console.log('failed to create new entity' );
+			function (response) {
+			    console.log('failed to create new entity');
 			}
 		);
-		$scope.addNewFormIsVisible = false;
-		$scope.newEnt = {name : '', url: '',  description: ''};
+        $scope.addNewFormIsVisible = false;
+        $scope.newEnt = { name: '', url: '', description: '' };
 
-	}
-	
-	$scope.deleteEntity =  function(entId){
-		$scope.processMessage  = 'Deleting entity';
-		$scope.showProcessMessage = true;
-		EntityFactory.entities.delete({'entId': entId}, 
-			function (response){
-				console.log('Entity Deleted id:' + 'response._id');
-				EntityFactory.entities.query( 
-				function (response){
-					$scope.ents=response;
+    }
+
+    $scope.deleteEntity = function (entId) {
+        $scope.processMessage = 'Deleting entity';
+        $scope.showProcessMessage = true;
+        EntityFactory.entities.delete({ 'entId': entId },
+			function (response) {
+			    console.log('Entity Deleted id:' + 'response._id');
+			    EntityFactory.entities.query(
+				function (response) {
+				    $scope.ents = response;
 				},
-				function(response){
-					console.log('Error found in controller while deleting the entities ');
-					$scope.processMessage  = 'Error found in controller while deleting the entities ';
-					$scope.showProcessMessage = true;
+				function (response) {
+				    console.log('Error found in controller while deleting the entities ');
+				    $scope.processMessage = 'Error found in controller while deleting the entities ';
+				    $scope.showProcessMessage = true;
 				}
 				);
 			},
-			function (response){
-				console.log('failed to delete entity' );
-				$scope.processMessage  = 'failed to delete entity  ';
-				$scope.showProcessMessage = true;
+			function (response) {
+			    console.log('failed to delete entity');
+			    $scope.processMessage = 'failed to delete entity  ';
+			    $scope.showProcessMessage = true;
 			})
-	};
-	
-	$scope.cancelAddNew= function(){
-		$scope.processMessage  = '';
-		$scope.showProcessMessage = false;
-		$scope.addNewFormIsVisible = false;
-		$scope.newEnt = {name : '', url: '',  description: ''};
-	}
+    };
+
+    $scope.cancelAddNew = function () {
+        $scope.processMessage = '';
+        $scope.showProcessMessage = false;
+        $scope.addNewFormIsVisible = false;
+        $scope.newEnt = { name: '', url: '', description: '' };
+    }
 }])
 .controller('ArticleController', ['$scope', 'ngDialog', '$localStorage', 'ArticleFactory', function ($scope, ngDialog, $localStorage, ArticleFactory) {
-	$scope.arts = {};
-	$scope.addNewFormIsVisible = false;
-	$scope.processMessage  = '';
-	$scope.showProcessMessage = false;
-	$scope.tableControls = [];  // This array will containg objects like {edit: true} and it will be a parralel array with the controls
-	$scope.newArt =  {name : '', link: '',  description: '', longDescription: '',isActive : true};
-	ArticleFactory.articles.query( 
-	function (response){
-		$scope.showProcessMessage = false;
-		$scope.arts=response;
-		if ($scope.arts && Array.isArray($scope.arts) && $scope.arts.length >0){
-			for (var j = 0; j < $scope.arts.length; j++){
-				$scope.arts[j].edit=false;
-				$scope.arts[j].lineId=j;
-			}			
-		}
+    $scope.arts = {};
+    $scope.addNewFormIsVisible = false;
+    $scope.processMessage = '';
+    $scope.showProcessMessage = false;
+    $scope.newArt = { name: '', link: '', description: '', longDescription: '', isActive: true };
+    ArticleFactory.articles.query(
+	function (response) {
+	    $scope.showProcessMessage = false;
+	    $scope.arts = response;
+	    if ($scope.arts && Array.isArray($scope.arts) && $scope.arts.length > 0) {
+	        for (var j = 0; j < $scope.arts.length; j++) {
+	            $scope.arts[j].edit = false;
+	            $scope.arts[j].lineId = j;
+	        }
+	    }
 	},
-	function(response){
-		console.log('Error found in controller while retrieving the articles ');		
-		$scope.processMessage = response.data;
-		$scope.showProcessMessage = true;
-		$scope.tableControls = [];
+	function (response) {
+	    console.log('Error found in controller while retrieving the articles ');
+	    $scope.processMessage = response.data;
+	    $scope.showProcessMessage = true;
 	}
 	);
-	
-	$scope.showAddNewForm = function(isVisible){
-		$scope.showProcessMessage = false;
-		$scope.addNewFormIsVisible = isVisible;
-	}
-	
-	$scope.addNewArticle = function(){		
-		$scope.processMessage  = '';
-		$scope.showProcessMessage = false;
-		ArticleFactory.articles.save($scope.newArt, 
-			function (response){
-				console.log('new Article Created id:' + 'response._id');
-				ArticleFactory.articles.query( 
-				function (response){
-					$scope.arts=response;
+
+    $scope.showAddNewForm = function (isVisible) {
+        $scope.showProcessMessage = false;
+        $scope.addNewFormIsVisible = isVisible;
+    }
+
+    $scope.addNewArticle = function () {
+        $scope.processMessage = '';
+        $scope.showProcessMessage = false;
+        ArticleFactory.articles.save($scope.newArt,
+			function (response) {
+			    console.log('new Article Created id:' + 'response._id');
+			    ArticleFactory.articles.query(
+				function (response) {
+				    $scope.arts = response;
 				},
-				function(response){
-					console.log('Error found in controller while retrieving the articles` ');
+				function (response) {
+				    console.log('Error found in controller while retrieving the articles` ');
 				}
 				);
 			},
-			function (response){
-				console.log('failed to create new article' );
+			function (response) {
+			    console.log('failed to create new article');
 			}
 		);
-		$scope.addNewFormIsVisible = false;
-		$scope.newArt = {name : '', link: '',  description: '', longDescription: '',isActive : true};
+        $scope.addNewFormIsVisible = false;
+        $scope.newArt = { name: '', link: '', description: '', longDescription: '', isActive: true };
 
-	}
-	
-	$scope.deleteArticle =  function(artId){
-		$scope.processMessage  = 'Deleting article';
-		$scope.showProcessMessage = true;
-		ArticleFactory.articles.delete({'artId': artId}, 
-			function (response){
-				console.log('Article Deleted id:' + 'response._id');
-				ArticleFactory.articles.query( 
-				function (response){
-					$scope.arts=response;
+    }
+
+    $scope.deleteArticle = function (artId) {
+        $scope.processMessage = 'Deleting article';
+        $scope.showProcessMessage = true;
+        ArticleFactory.articles.delete({ 'artId': artId },
+			function (response) {
+			    console.log('Article Deleted id:' + 'response._id');
+			    ArticleFactory.articles.query(
+				function (response) {
+				    $scope.arts = response;
 				},
-				function(response){
-					console.log('Error found in controller while deleting the articles ');
-					$scope.processMessage  = 'Error found in controller while deleting the articles ';
-					$scope.showProcessMessage = true;
+				function (response) {
+				    console.log('Error found in controller while deleting the articles ');
+				    $scope.processMessage = 'Error found in controller while deleting the articles ';
+				    $scope.showProcessMessage = true;
 				}
 				);
 			},
-			function (response){
-				console.log('failed to delete article' );
-				$scope.processMessage  = 'failed to delete article  ';
-				$scope.showProcessMessage = true;
+			function (response) {
+			    console.log('failed to delete article');
+			    $scope.processMessage = 'failed to delete article  ';
+			    $scope.showProcessMessage = true;
 			})
-	};
-	
-	$scope.editArticle =  function(artId,lineId){
-		$scope.showProcessMessage = false;
-		if ($scope.arts && Array.isArray($scope.arts) && $scope.arts.length >0){
-			if( lineId >= 0 && lineId < $scope.arts.length ){
-				for (var j = 0; j < $scope.arts.length; j++){
-					$scope.arts[j].edit = j === lineId;
-				}			
-			}	
-		}
-	};
-	
-	$scope.saveEditedArticle = function(artId , lineId){
-		$scope.processMessage  = 'Saving change to article: ';
-		$scope.showProcessMessage = true;
-		var art = $scope.arts[lineId];
-		ArticleFactory.articles.update({artId: artId, name: art.name,  link: art.link, description: art.description, longDescription: art.longDescription, isActive: art.isActive }, 
-			function (response){
-				console.log('Article Saved -  id:' + 'response._id');
-				$scope.showProcessMessage = false;
-				$scope.processMessage='';
+    };
+
+    $scope.editArticle = function (artId, lineId) {
+        $scope.showProcessMessage = false;
+        if ($scope.arts && Array.isArray($scope.arts) && $scope.arts.length > 0) {
+            if (lineId >= 0 && lineId < $scope.arts.length) {
+                for (var j = 0; j < $scope.arts.length; j++) {
+                    $scope.arts[j].edit = j === lineId;
+                }
+            }
+        }
+    };
+
+    $scope.saveEditedArticle = function (artId, lineId) {
+        $scope.processMessage = 'Saving change to article: ';
+        $scope.showProcessMessage = true;
+        var art = $scope.arts[lineId];
+        ArticleFactory.articles.update({ artId: artId, name: art.name, link: art.link, description: art.description, longDescription: art.longDescription, isActive: art.isActive },
+			function (response) {
+			    console.log('Article Saved -  id:' + 'response._id');
+			    $scope.showProcessMessage = false;
+			    $scope.processMessage = '';
 			},
-			function (response){
-				console.log('failed to save Changes to  article ' );
-				$scope.processMessage  = 'failed to save change to article  ';
-				$scope.showProcessMessage = true;
+			function (response) {
+			    console.log('failed to save Changes to  article ');
+			    $scope.processMessage = 'failed to save change to article  ';
+			    $scope.showProcessMessage = true;
 			})
-		
-		$scope.arts[lineId].edit = false;
-	};
-	
-	$scope.cancelEditArticle = function(lineId){
-		$scope.arts[lineId].edit = false;
-	};
-	
-	$scope.cancelAddNew= function(){
-		$scope.processMessage  = '';
-		$scope.showProcessMessage = false;
-		$scope.addNewFormIsVisible = false;
-		$scope.newEnt = {name : '', url: '',  description: ''};
-	}
+
+        $scope.arts[lineId].edit = false;
+    };
+
+    $scope.cancelEditArticle = function (lineId) {
+        $scope.arts[lineId].edit = false;
+    };
+
+    $scope.cancelAddNew = function () {
+        $scope.processMessage = '';
+        $scope.showProcessMessage = false;
+        $scope.addNewFormIsVisible = false;
+        $scope.newEnt = { name: '', url: '', description: '' };
+    }
 }])
 
 ;

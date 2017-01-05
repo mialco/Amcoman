@@ -1,0 +1,73 @@
+
+<div class="container">
+    <div class="row" ng-show="showProcessMessage">
+        <div class="col-xl-12 process-message">
+            {{processMessage}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <ul class="breadcrumb">
+                <li><a href="index.html">Home</a></li>
+                <li>Admin</li>
+                <li> <a ui-sref="app.orgs">Organizations</a></li>
+                <li class="active">Organization Detail</li>
+            </ul>
+        </div>
+        <div class="col-xs-12">
+            <h3>Organization</h3>
+            <hr>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-md-push-2 col-md-6 col-md-pull-4 " ng-show="!addNewFormIsVisible">
+            <form ng-submit="">
+                <div class="form-group">
+                    <label class="sr-only" for="orgname1">Organization name </label>
+                    <input type="text" class="form-control input-sm" id="orgname1" ng-model="org.organizationName" disabled>
+                </div>
+                <div class="form-group">
+                    <label class="sr-only" for="contactname1">Contact Name </label>
+                    <input type="text" class="form-control input-sm" id="contactname1" ng-model="org.contactName" disabled>
+                </div>
+                <div class="form-group">
+                    <label class="sr-only" for="contactemail1">Contact Email </label>
+                    <input type="text" class="form-control input-sm" id="contactemail1" placeholder="Contact Email" ng-model="org.contactEmail" disabled>
+                </div>
+                <div class="form-group">
+                    <label class="sr-only" for="contactphone1">Contact Phone </label>
+                    <input type="text" class="form-control input-sm" id="contactphone1" placeholder="Contact Phone" ng-model="org.contactPhone" disabled>
+                </div>
+            </form>
+        </div>
+        <div class="col-xs-12 col-md-push-2 col-md-6 col-md-pull-4" ng-show="addNewFormIsVisible">
+            <form ng-submit="addNewOrg()">
+                <div class="form-group">
+                    <label class="sr-only" for="orgname">Organization name </label>
+                    <input type="text" class="form-control input-sm" id="orgname" placeholder="Organization Name" ng-model="newOrg.organizationName">
+                </div>
+                <div class="form-group">
+                    <label class="sr-only" for="contactname">Contact Name </label>
+                    <input type="text" class="form-control input-sm" id="contactname" placeholder="Contact Name" ng-model="newOrg.contactName">
+                </div>
+                <div class="form-group">
+                    <label class="sr-only" for="contactemail">Contact Email </label>
+                    <input type="text" class="form-control input-sm" id="contactemail" placeholder="Contact Email" ng-model="newOrg.contactEmail">
+                </div>
+                <div class="form-group">
+                    <label class="sr-only" for="contactphone">Contact Phone </label>
+                    <input type="text" class="form-control input-sm" id="contactphone" placeholder="Contact Phone" ng-model="newOrg.contactPhone">
+                </div>
+                <button type="submit" class="btn btn-info btn-sm">Save</button>
+                <button type="button" class="btn btn-default btn-sm" ng-click="cancelAddNew()">Cancel</button> &nbsp; &nbsp;
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-md-push-2 col-md-6 col-md-pull-4">
+            <input type="button" class="btn btn-warning" value="Add new organization" ng-click="showAddNewForm(true, false)" ng-show="! addNewFormIsVisible">
+            <input type="button" class="btn btn-info" value="Edit" ng-click="showAddNewForm(true, true)" ng-show="! addNewFormIsVisible">
+            <input type="button" class="btn btn-default btn-sm" ui-sref="app.orgs" ng-show="!addNewFormIsVisible" value="Back">
+        </div>
+    </div>
+</div>

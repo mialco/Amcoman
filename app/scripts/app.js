@@ -79,6 +79,17 @@ angular.module('confusionApp', ['ui.router','ngResource','ngDialog'])
             })
 
             // route for the dishdetail page
+            .state('app.orgDetails', {
+                url: 'admin/orgs/details?orgId',
+                views: {
+                    'content@': {
+                        templateUrl: 'views/organizationDetails.html',
+                        controller: 'OrganizationDetailController'
+                    }
+                }
+            })
+
+            // route for the dishdetail page
             .state('app.entities', {
                 url: 'admin/entities',
                 views: {
