@@ -6,16 +6,25 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-xs-12" ng-show="showOrgBreadcrumbs">
             <ul class="breadcrumb">
                 <li><a href="index.html">Home</a></li>
                 <li>Admin</li>
                 <li> <a ui-sref="app.orgs">Organizations</a></li>
-                <li class="active">Organization Detail</li>
+                <li> <a ui-sref="app.orgDetails({orgId: orgId})">Organization Details</a></li>
+                <li class="active">Entity Details</li>
+            </ul>
+        </div>
+        <div class="col-xs-12" ng-show="!showOrgBreadcrumbs">
+            <ul class="breadcrumb">
+                <li><a href="index.html">Home</a></li>
+                <li>Admin</li>
+                <li> <a ui-sref="app.entities()">Entities</a></li>
+                <li class="active">Entity Details</li>
             </ul>
         </div>
         <div class="col-xs-12">
-            <h3>Organization</h3>
+            <h3>Entity Details</h3>
             <hr>
         </div>
     </div>
@@ -76,6 +85,7 @@
         </div>
     </div>
     <div class="row">
+
         <div class="col-xs-12 col-md-push-2 col-md-6 col-md-pull-4" ng-show="showEntities">
             <table class="table table-striped">
                 <thead>
@@ -88,36 +98,10 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat="ent in org.entities">
-                        <td><a ui-sref="app.entityDetails({entId: ent._id, orgId:org._id})">{{ent.name}}</a></td>
+                        <td><a ui-sref="app.entityDetails"="">{{ent.name}}</a></td>
                         <td>{{ent.url}}</td>
                         <td>{{ent.description}}</td>
                         <td><button class="btn btn-link" ng-click="removeEntity(ent._id)">Remove</button></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div class="row" ng-show="showAvailableEntities">
-        <div class="col-xs-12 col-md-push-2">
-            <h3>Available Entities</h3>
-            Select an entity to add to this organization or <a ng-click="cancelAddingEntities()" >Collapse available entities</a>
-        </div>
-        <div class="col-xs-12 col-md-push-2 col-md-6" style="background: azure">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Entity Name</th>
-                        <th>Entity Url</th>
-                        <th>Entity Description</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="ent in availableEntities">
-                        <td><a ui-sref="app.entityDetails({entId: ent._id, orgId:org._id})">{{ent.name}}</a></td>
-                        <td>{{ent.url}}</td>
-                        <td>{{ent.description}}</td>
-                        <td><button class="btn btn-link" ng-click="addEntity(ent._id)">Add</button></td>
                     </tr>
                 </tbody>
             </table>
@@ -128,7 +112,7 @@
             <div class="btn-group">
                 <input type="button" class="btn btn-warning" value="Add new organization" ng-click="showAddNewForm(true, false)" ng-show="! addNewFormIsVisible">
                 <input type="button" class="btn btn-primary" value="Edit" ng-click="showAddNewForm(true, true)" ng-show="! addNewFormIsVisible">
-                <input type="button" class="btn btn-warning" value="Show Available Entities" ng-click="showAvailableEntity(true)" ng-show="! showAvailableEntities">
+                <input type="button" class="btn btn-warning" value="Add Entity" ng-click="showAddNewForm(true, true)" ng-show="! addNewFormIsVisible">
                 <input type="button" class="btn btn-link" ui-sref="app.orgs" ng-show="!addNewFormIsVisible" value="Back">
             </div>
         </div>

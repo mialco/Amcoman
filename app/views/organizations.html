@@ -52,17 +52,8 @@
                     </td>
                     <td>
                         <div ng-show="!org.edit">
-                            <select ng-model="org.entities" name="entitiesselect">
-                                <option ng-repeat="ent in org.entities" value="{{ent._id}}">{{ent.name}}</option>
-                            </select>
-                            <a>Entities ({{org.entitiesCount}})</a>
+                            <a ui-sref="app.orgDetails({orgId:org._id})" >Entities ({{org.entitiesCount}})</a>
                         </div>
-                        <div ng-show="org.edit">
-                            <select ng-model="org.entities" name="entitiesselect">
-                                <option ng-repeat="ent in org.entities" value="{{ent._id}}">{{ent.name}}</option>
-                            </select>
-                        </div>
-
                     </td>
                     <td>
                         <div ng-show="!org.edit">

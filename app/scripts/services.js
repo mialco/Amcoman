@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('confusionApp')
+angular.module('amcomanApp')
 .constant("baseURL", "http://localhost:3022/")
 //.constant("baseURL", "https://amcoman.mybluemix.net/")
 .factory('menuFactory', ['$resource', 'baseURL', function ($resource, baseURL) {
@@ -174,9 +174,8 @@ angular.module('confusionApp')
     
 }])
 .factory('OrgFactory', ['$resource', '$http', '$localStorage', '$rootScope', '$window', 'baseURL', 'ngDialog', function($resource, $http, $localStorage, $rootScope, $window, baseURL, ngDialog){
-	
-
-	return $resource(baseURL + "orgs/:orgId", {orgId: '@orgId'}, {
+    var orgFac = {};
+    orgFac.orgs =  $resource(baseURL + "orgs/:orgId", { orgId: '@orgId' }, {
         'update': { method: 'PUT' },
         'query': { method: 'GET', isArray: true },
         'getOne': { method: 'GET', isArray: false },
@@ -184,12 +183,19 @@ angular.module('confusionApp')
 		
     });
 	
-	
+    orgFac.ents = $resource(baseURL + "orgs/entity/:orgId/:entId", { orgId: '@orgId', entId: '@entId' }, {
+        'update': { method: 'PUT' },
+        'delete': { method: 'DELETE' }
+    });
+
+
+    return orgFac;
 }])
-.factory('EntityFactory', ['$resource', '$http', '$localStorage', '$rootScope', '$window', 'baseURL', 'ngDialog', function($resource, $http, $localStorage, $rootScope, $window, baseURL, ngDialog){
+
+.factory('EntityFactory', ['$resource', '$http', '$localStorage', '$rootScope', '$window', 'baseURL', 'ngDialog', function ($resource, $http, $localStorage, $rootScope, $window, baseURL, ngDialog) {
 	
 	var entFac ={};
-	entFac.entities=$resource(baseURL + "entities", null, {
+	entFac.entities=$resource(baseURL + 'entities', null, {
         'update': {
             method: 'PUT'
         },
@@ -197,6 +203,7 @@ angular.module('confusionApp')
 		'save' : {method: 'POST'}
     });
 	
+	entFac.entitiesNotInOrg = $resource(baseURL + 'entities/notinorg/:orgId', { orgId: '@orgId' }, { get: {method: 'GET', isArray : true}});
 	
 	
 	return entFac;

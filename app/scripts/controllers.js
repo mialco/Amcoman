@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('confusionApp')
+angular.module('amcomanApp')
 
 .controller('MenuController', ['$scope', 'menuFactory', 'favoriteFactory', function ($scope, menuFactory, favoriteFactory) {
 
@@ -292,7 +292,7 @@ angular.module('confusionApp')
     $scope.newOrg = { organizationName: '', contactName: '', contactEmail: '', contactPhone: '' };
     $scope.orgSelected = {};
 
-    OrgFactory.query(
+    OrgFactory.orgs.query(
 	function (response) {
 	    $scope.showProcessMessage = false;
 	    $scope.orgs = response;
@@ -314,10 +314,10 @@ angular.module('confusionApp')
         $scope.processMessage = '';
         $scope.showProcessMessage = false;
 
-        OrgFactory.save($scope.newOrg,
+        OrgFactory.orgs.save($scope.newOrg,
 			function (response) {
 			    console.log('new organization Created id:' + 'response._id');
-			    OrgFactory.query(
+			    OrgFactory.orgs.query(
 				function (response) {
 				    $scope.orgs = response;
 				    resetLinesProps($scope.orgs);
@@ -345,10 +345,10 @@ angular.module('confusionApp')
     $scope.deleteOrg = function (orgId) {
         $scope.processMessage = 'Deleting organization';
         $scope.showProcessMessage = true;
-        OrgFactory.delete({ 'orgId': orgId },
+        OrgFactory.orgs.delete({ 'orgId': orgId },
 			function (response) {
 			    console.log('Organization Deleted id:' + 'response._id');
-			    OrgFactory.query(
+			    OrgFactory.orgs.query(
 				function (response) {
 				    $scope.orgs = response;
 				    resetLinesProps($scope.orgs);
@@ -385,7 +385,7 @@ angular.module('confusionApp')
         $scope.processMessage = 'Saving change to orgicle: ';
         $scope.showProcessMessage = true;
         var org = $scope.orgs[lineId];
-        OrgFactory.update({ orgId: orgId, organizationName: org.organizationName, contactName: org.contactName, contactEmail: org.contactEmail, contatPhone: org.contactPhone },
+        OrgFactory.orgs.update({ orgId: orgId, organizationName: org.organizationName, contactName: org.contactName, contactEmail: org.contactEmail, contatPhone: org.contactPhone },
 			function (response) {
 			    console.log('Organation Saved -  id:' + 'response._id');
 			    $scope.showProcessMessage = false;
@@ -418,7 +418,7 @@ angular.module('confusionApp')
     }
 
 }])
-.controller('OrganizationDetailController', ['$scope', '$stateParams', 'ngDialog', '$localStorage', 'OrgFactory', function ($scope, $stateParams, ngDialog, $localStorage, OrgFactory) {
+.controller('OrganizationDetailController', ['$scope', '$stateParams', 'ngDialog', '$localStorage', 'OrgFactory', 'EntityFactory', function ($scope, $stateParams, ngDialog, $localStorage, OrgFactory, EntityFactory) {
     $scope.org = {};
     $scope.addNewFormIsVisible = false;
     $scope.editCurrent = false;
@@ -426,14 +426,22 @@ angular.module('confusionApp')
     $scope.showProcessMessage = false;
     $scope.newOrg = {};
     $scope.selectedOrgId = $stateParams.orgId;
+    $scope.entitiesCount = 0;
+    $scope.showEntities = false;
+    $scope.addNewEntityFormIsVisible = false;
+    $scope.availableEntities = [];
+    $scope.availableEntitiesNeedsRefresh = true;
+    $scope.showAvailableEntities = false;
+    $scope.selectedEntity = '';
 
     resetNewOrg();
 
     //Getting the organuization from the server
-    OrgFactory.getOne({ orgId: $scope.selectedOrgId },
+    OrgFactory.orgs.getOne({ orgId: $scope.selectedOrgId },
 	function (response) {
 	    $scope.showProcessMessage = false;
 	    $scope.org = response;
+	    configureEntities();
 	},
 	function (response) {
 	    console.log('Error found in controller while retrieving the organizations ');
@@ -452,6 +460,26 @@ angular.module('confusionApp')
         }
     };
 
+    $scope.showAvailableEntity = function (isVisible) {
+        $scope.showProcessMessage = false;
+        $scope.showAvailableEntities = isVisible;
+        if ($scope.availableEntitiesNeedsRefresh) {
+            retrieveAvailableEntities();
+        }
+    };
+
+    function retrieveAvailableEntities() {
+        EntityFactory.entitiesNotInOrg.query({ orgId: $scope.selectedOrgId }, function (response) {
+            $scope.availableEntities = response;
+            $scope.availableEntitiesNeedsRefresh = false;
+        }, function (response) {
+            $scopeAvailableEntites = [];
+            $scope.showProcessMessage = true;
+            $scope.processMessage = "Failed to retrieve entities for this organization";
+        });
+    }
+
+
     $scope.addNewOrg = function () {
         $scope.processMessage = '';
         $scope.showProcessMessage = false;
@@ -460,17 +488,18 @@ angular.module('confusionApp')
             $scope.editCurrent = false;
             $scope.saveCurrentOrg();
         } else {
-            OrgFactory.save($scope.newOrg,
+            OrgFactory.orgs.save($scope.newOrg,
                 function (response) {
                     console.log('new organization Created id:' + 'response._id');
                     $scope.org = response;
+                    configureEntities();
                 },
                 function (response) {
                     console.log('failed to create new organization');
                 }
             );
         }
-        $scope.addNewFormIsVisible = false;        
+        $scope.addNewFormIsVisible = false;
     };
 
     $scope.cancelAddNew = function () {
@@ -491,7 +520,7 @@ angular.module('confusionApp')
         $scope.processMessage = 'Saving change to organization: ';
         $scope.showProcessMessage = true;
         var org = $scope.org;
-        OrgFactory.update({ orgId: org._id, organizationName: org.organizationName, contactName: org.contactName, contactEmail: org.contactEmail, contactPhone: org.contactPhone },
+        OrgFactory.orgs.update({ orgId: org._id, organizationName: org.organizationName, contactName: org.contactName, contactEmail: org.contactEmail, contactPhone: org.contactPhone },
 			function (response) {
 			    console.log('Organization Saved -  id:' + 'response._id');
 			    $scope.showProcessMessage = false;
@@ -507,14 +536,90 @@ angular.module('confusionApp')
 			});
     };
 
-    //$scope.cancelEditOrg = function (lineId) {
-    //    $scope.orgs[lineId].edit = false;
-    //};
+    $scope.removeEntity = function (entId) {
+        $scope.processMessage = 'Adding Entity to organization: ';
+        $scope.showProcessMessage = true;
+        OrgFactory.ents.delete({ orgId: $scope.selectedOrgId, entId: entId },
+            function (response) {
+                // Update the org object
+                OrgFactory.orgs.getOne({ orgId: $scope.selectedOrgId },
+                function (response) {
+                    $scope.showProcessMessage = false;
+                    $scope.org = response;
+                    configureEntities();
+                    retrieveAvailableEntities();
+                },
+                function (response) {
+                    console.log('Error found in controller while retrieving the organizations after adding entity ');
+                    $scope.processMessage = response.data;
+                    $scope.showProcessMessage = true;
+                });
+            },
+            function (response) {
+                console.log('Organization Details form failed to add entity to   organization  ');
+                $scope.processMessage = 'Failed to add entity to organization ';
+                $scope.showProcessMessage = true;
+            });
+    };
+
+    $scope.addEntity = function (entId) {
+        $scope.processMessage = 'Adding Entity to organization: ';
+        $scope.showProcessMessage = true;
+        OrgFactory.ents.update({ orgId: $scope.selectedOrgId, entId: entId },
+            function (response) {
+                // Update the org object
+                OrgFactory.orgs.getOne({ orgId: $scope.selectedOrgId },
+                function (response) {
+                    $scope.showProcessMessage = false;
+                    $scope.org = response;
+                    configureEntities();
+                },
+                function (response) {
+                    console.log('Error found in controller while retrieving the organizations after adding entity ');
+                    $scope.processMessage = response.data;
+                    $scope.showProcessMessage = true;
+                });
+                retrieveAvailableEntities();
+            },
+            function (response) {
+                console.log('Organization Details form failed to add entity to   organization  ');
+                $scope.processMessage = 'Failed to add entity to organization ';
+                $scope.showProcessMessage = true;
+            });
+    };
+
+    $scope.availableEntities = function () {
+        EntityFactory.entitiesNotInOrg.query({ orgId: $scope.selectedOrgId },
+            function (response) {
+                $scope.availableEntities = response;
+            },
+            function (response) {
+                $scope.availableEntities = [];
+                console.log('Organization Details form failed to add entity to   organization  ');
+                $scope.processMessage = 'Failed to add entity to organization ';
+                $scope.showProcessMessage = true;
+            }
+            );
+    };
+
+
+
+    $scope.cancelAddingEntities = function () {
+        $scope.showAvailableEntities = false;
+    }
 
     function resetNewOrg() {
         $scope.newOrg = { organizationName: '', contactName: '', contactEmail: '', contactPhone: '' }
     }
 
+    function configureEntities() {
+        var entitiesCount = 0;
+        if ($scope.org && $scope.org.entities && Array.isArray($scope.org.entities)) {
+            entitiesCount = $scope.org.entities.length;
+        }
+        $scope.showEntities = entitiesCount > 0;
+        $scope.entitiesCount = entitiesCount;
+    }
 }])
 .controller('EntityController', ['$scope', 'ngDialog', '$localStorage', 'EntityFactory', function ($scope, ngDialog, $localStorage, EntityFactory) {
     $scope.ents = {};
@@ -523,6 +628,94 @@ angular.module('confusionApp')
     $scope.showProcessMessage = false;
     $scope.newEnt = { name: '', url: '', description: '' };
 
+    EntityFactory.entities.query(
+	function (response) {
+	    $scope.showProcessMessage = false;
+	    $scope.ents = response;
+	},
+	function (response) {
+	    console.log('Error found in controller while retrieving the entities ');
+	    $scope.processMessage = response.data;
+	    $scope.showProcessMessage = true;
+	}
+	);
+
+    $scope.showAddNewForm = function (isVisible) {
+        $scope.showProcessMessage = false;
+        $scope.addNewFormIsVisible = isVisible;
+    }
+
+    $scope.addNewEntity = function () {
+        $scope.processMessage = '';
+        $scope.showProcessMessage = false;
+        EntityFactory.entities.save($scope.newEnt,
+			function (response) {
+			    console.log('new Entity Created id:' + 'response._id');
+			    EntityFactory.entities.query(
+				function (response) {
+				    $scope.ents = response;
+				},
+				function (response) {
+				    console.log('Error found in controller while retrieving the entities ');
+				}
+				);
+			},
+			function (response) {
+			    console.log('failed to create new entity');
+			}
+		);
+        $scope.addNewFormIsVisible = false;
+        $scope.newEnt = { name: '', url: '', description: '' };
+
+    }
+
+    $scope.deleteEntity = function (entId) {
+        $scope.processMessage = 'Deleting entity';
+        $scope.showProcessMessage = true;
+        EntityFactory.entities.delete({ 'entId': entId },
+			function (response) {
+			    console.log('Entity Deleted id:' + 'response._id');
+			    EntityFactory.entities.query(
+				function (response) {
+				    $scope.ents = response;
+				},
+				function (response) {
+				    console.log('Error found in controller while deleting the entities ');
+				    $scope.processMessage = 'Error found in controller while deleting the entities ';
+				    $scope.showProcessMessage = true;
+				}
+				);
+			},
+			function (response) {
+			    console.log('failed to delete entity');
+			    $scope.processMessage = 'failed to delete entity  ';
+			    $scope.showProcessMessage = true;
+			})
+    };
+
+    $scope.cancelAddNew = function () {
+        $scope.processMessage = '';
+        $scope.showProcessMessage = false;
+        $scope.addNewFormIsVisible = false;
+        $scope.newEnt = { name: '', url: '', description: '' };
+    }
+}])
+.controller('EntityDetailController', ['$scope', '$stateParams', '$localStorage', 'EntityFactory', function ($scope, $stateParams, $localStorage, EntityFactory) {
+    $scope.ents = {};
+    $scope.addNewFormIsVisible = false;
+    $scope.processMessage = '';
+    $scope.showProcessMessage = false;
+    $scope.newEnt = { name: '', url: '', description: '' };
+    $scope.orgId = '';
+    $scope.entId = '';
+    $scope.showOrgBreadcrumbs = false;
+
+    $scope.entId = $stateParams.entId;
+    $scope.orgId = $stateParams.orgId;
+
+    if ($scope.entId && $scope.orgId) {
+        $scope.showOrgBreadcrumbs = true;
+    }
     EntityFactory.entities.query(
 	function (response) {
 	    $scope.showProcessMessage = false;

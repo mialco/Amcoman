@@ -111,3 +111,8 @@ body {
 	right: auto;
 	border 1px solid black;
 }
+
+.div-separator{
+    height:25px;
+    background : lightgray;
+}
