@@ -626,12 +626,30 @@ angular.module('amcomanApp')
     $scope.addNewFormIsVisible = false;
     $scope.processMessage = '';
     $scope.showProcessMessage = false;
-    $scope.newEnt = { name: '', url: '', description: '' };
+    $scope.newEnt = {};
+    $scope.EditCurrent = false;
 
+    var resetNewEntity = function () {
+        $scope.newEnt = { name: '', url: '', description: '' };
+    }
+
+    var resetLinesProps = function (items) {
+        if (items && Array.isArray(items) && items.length > 0) {
+            for (var j = 0; j < items.length; j++) {
+                items[j].edit = false;
+                items[j].lineId = j;
+            }
+        }
+    }
+
+
+    resetNewEntity();
     EntityFactory.entities.query(
 	function (response) {
 	    $scope.showProcessMessage = false;
-	    $scope.ents = response;
+	    var ents = response;
+	    resetLinesProps(ents);
+	    $scope.ents = ents;
 	},
 	function (response) {
 	    console.log('Error found in controller while retrieving the entities ');
@@ -653,7 +671,9 @@ angular.module('amcomanApp')
 			    console.log('new Entity Created id:' + 'response._id');
 			    EntityFactory.entities.query(
 				function (response) {
-				    $scope.ents = response;
+				    var ents = response;
+				    resetLinesProps(ents);
+				    $scope.ents = ents;
 				},
 				function (response) {
 				    console.log('Error found in controller while retrieving the entities ');
@@ -677,7 +697,11 @@ angular.module('amcomanApp')
 			    console.log('Entity Deleted id:' + 'response._id');
 			    EntityFactory.entities.query(
 				function (response) {
-				    $scope.ents = response;
+				    var ents = response;
+				    resetLinesProps(ents);
+				    $scope.ents = ents;
+				    $scope.processMessage = '';
+				    $scope.showProcessMessage = false;
 				},
 				function (response) {
 				    console.log('Error found in controller while deleting the entities ');
@@ -699,6 +723,40 @@ angular.module('amcomanApp')
         $scope.addNewFormIsVisible = false;
         $scope.newEnt = { name: '', url: '', description: '' };
     }
+
+    $scope.editEntity = function (ent) {
+        $scope.showProcessMessage = false;
+        var lineId = 0;
+        if (ent) lineId = ent.lineId | 0;
+        if ($scope.ents && Array.isArray($scope.ents) && $scope.ents.length > 0) {
+            if (lineId >= 0 && lineId < $scope.ents.length) {
+                for (var j = 0; j < $scope.ents.length; j++) {
+                    $scope.ents[j].edit = j === lineId;
+                }
+            }
+        }
+    };
+
+    $scope.saveEditedEntity = function(entId, lineId){
+        $scope.processMessage = 'Saving change to entity: ';
+        $scope.showProcessMessage = true;
+        var ent = $scope.ents[lineId];
+        EntityFactory.entities.update({ entId: ent._id, name: ent.name, url: ent.url, description: ent.description },
+			function (response) {
+			    console.log('Entity Saved -  id:' + 'response._id');
+			    $scope.showProcessMessage = false;
+			    $scope.processMessage = '';
+			    $scope.ents[lineId].edit = false; 
+			},
+			function (response) {
+			    console.log('failed to save Changes to  entity  ');
+			    $scope.processMessage = 'failed to save change to entity ';
+			    $scope.showProcessMessage = true;
+			})
+    }
+    $scope.cancelEditEntity = function myfunction(lineId) {
+        $scope.ents[lineId].edit=false;
+    };
 }])
 .controller('EntityDetailController', ['$scope', '$stateParams', '$localStorage', 'EntityFactory', function ($scope, $stateParams, $localStorage, EntityFactory) {
     $scope.ents = {};

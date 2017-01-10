@@ -13,27 +13,6 @@ angular.module('amcomanApp')
 
 }])
 
-.factory('commentFactory', ['$resource', 'baseURL', function ($resource, baseURL) {
-
-        return $resource(baseURL + "dishes/:id/comments/:commentId", {id:"@Id", commentId: "@CommentId"}, {
-            'update': {
-                method: 'PUT'
-            }
-        });
-
-}])
-
-.factory('feedbackFactory', ['$resource', 'baseURL', function ($resource, baseURL) {
-
-
-    return $resource(baseURL + "feedback/:id", null, {
-            'update': {
-                method: 'PUT'
-            }
-        });
-
-}])
-
 .factory('$localStorage', ['$window', function ($window) {
     return {
         store: function (key, value) {
@@ -195,12 +174,13 @@ angular.module('amcomanApp')
 .factory('EntityFactory', ['$resource', '$http', '$localStorage', '$rootScope', '$window', 'baseURL', 'ngDialog', function ($resource, $http, $localStorage, $rootScope, $window, baseURL, ngDialog) {
 	
 	var entFac ={};
-	entFac.entities=$resource(baseURL + 'entities', null, {
+	entFac.entities = $resource(baseURL + 'entities/:entId', {entId: '@entId'}, {
         'update': {
             method: 'PUT'
         },
 		'query':  {method:'GET', isArray:true},
-		'save' : {method: 'POST'}
+		'save': { method: 'POST' },
+        'delete': {method: 'DELETE'}
     });
 	
 	entFac.entitiesNotInOrg = $resource(baseURL + 'entities/notinorg/:orgId', { orgId: '@orgId' }, { get: {method: 'GET', isArray : true}});
