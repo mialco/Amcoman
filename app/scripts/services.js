@@ -178,7 +178,8 @@ angular.module('amcomanApp')
         'update': {
             method: 'PUT'
         },
-		'query':  {method:'GET', isArray:true},
+        'query': { method: 'GET', isArray: true },
+        'getOne': { method: 'GET', isArray: false },
 		'save': { method: 'POST' },
         'delete': {method: 'DELETE'}
     });

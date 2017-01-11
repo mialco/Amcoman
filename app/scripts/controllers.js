@@ -629,10 +629,14 @@ angular.module('amcomanApp')
     $scope.newEnt = {};
     $scope.EditCurrent = false;
 
+    //Creates a new instance of entity
     var resetNewEntity = function () {
         $scope.newEnt = { name: '', url: '', description: '' };
     }
 
+    // Used after retrieving the data from the server to add additional fields
+    // Used by the UI to control the manipulation of individual records
+    // The fields are lineId (a running integer) and edit (a boolean indicating when a  line is being edited)
     var resetLinesProps = function (items) {
         if (items && Array.isArray(items) && items.length > 0) {
             for (var j = 0; j < items.length; j++) {
@@ -644,6 +648,7 @@ angular.module('amcomanApp')
 
 
     resetNewEntity();
+    // Using Entity factory we a are retrieving the entities from the database
     EntityFactory.entities.query(
 	function (response) {
 	    $scope.showProcessMessage = false;
@@ -658,11 +663,13 @@ angular.module('amcomanApp')
 	}
 	);
 
+    // It sets the variables to show teh new Entity form 
     $scope.showAddNewForm = function (isVisible) {
         $scope.showProcessMessage = false;
         $scope.addNewFormIsVisible = isVisible;
     }
 
+    // using the entity factory we are adding a new entity to the database, then we are retrieving all the entities again
     $scope.addNewEntity = function () {
         $scope.processMessage = '';
         $scope.showProcessMessage = false;
@@ -689,6 +696,8 @@ angular.module('amcomanApp')
 
     }
 
+    // Using the entity factory, we are deleting an entity 
+    // Then we are retrieving the entity records form the database
     $scope.deleteEntity = function (entId) {
         $scope.processMessage = 'Deleting entity';
         $scope.showProcessMessage = true;
@@ -717,6 +726,7 @@ angular.module('amcomanApp')
 			})
     };
 
+    // When the Add New form is thisplay , this will set the variales to hide the form and reset the new entity object
     $scope.cancelAddNew = function () {
         $scope.processMessage = '';
         $scope.showProcessMessage = false;
@@ -724,6 +734,8 @@ angular.module('amcomanApp')
         $scope.newEnt = { name: '', url: '', description: '' };
     }
 
+    // Prepares the line for editing by setting the boolean edit for the respective line
+    // It is invoked by the edit button
     $scope.editEntity = function (ent) {
         $scope.showProcessMessage = false;
         var lineId = 0;
@@ -737,7 +749,9 @@ angular.module('amcomanApp')
         }
     };
 
-    $scope.saveEditedEntity = function(entId, lineId){
+    // After the entity line is edited, this is invoked to sent the changes to the database
+    // Using the entity factory with entities resource, update function
+    $scope.saveEditedEntity = function (entId, lineId) {
         $scope.processMessage = 'Saving change to entity: ';
         $scope.showProcessMessage = true;
         var ent = $scope.ents[lineId];
@@ -746,7 +760,7 @@ angular.module('amcomanApp')
 			    console.log('Entity Saved -  id:' + 'response._id');
 			    $scope.showProcessMessage = false;
 			    $scope.processMessage = '';
-			    $scope.ents[lineId].edit = false; 
+			    $scope.ents[lineId].edit = false;
 			},
 			function (response) {
 			    console.log('failed to save Changes to  entity  ');
@@ -754,96 +768,106 @@ angular.module('amcomanApp')
 			    $scope.showProcessMessage = true;
 			})
     }
+
+    //Unsets the edit flag for the respecive line
+    // this way hiding thr edit elements of the line
     $scope.cancelEditEntity = function myfunction(lineId) {
-        $scope.ents[lineId].edit=false;
+        $scope.ents[lineId].edit = false;
     };
 }])
-.controller('EntityDetailController', ['$scope', '$stateParams', '$localStorage', 'EntityFactory', function ($scope, $stateParams, $localStorage, EntityFactory) {
-    $scope.ents = {};
+
+.controller('EntityDetailController', ['$scope', '$state', '$stateParams', 'EntityFactory', function ($scope, $state, $stateParams, EntityFactory) {
+    $scope.ent = {};
     $scope.addNewFormIsVisible = false;
     $scope.processMessage = '';
     $scope.showProcessMessage = false;
-    $scope.newEnt = { name: '', url: '', description: '' };
+    $scope.newEnt = {};
     $scope.orgId = '';
     $scope.entId = '';
     $scope.showOrgBreadcrumbs = false;
+    $scope.editMode = false;
 
     $scope.entId = $stateParams.entId;
+
+    //The orgId parameter may compe into place if the view is being invoked from the organization page
     $scope.orgId = $stateParams.orgId;
 
-    if ($scope.entId && $scope.orgId) {
-        $scope.showOrgBreadcrumbs = true;
+    var resetNewEntity = function () {
+        $scope.newEnt = { name: '', url: '', description: '' };
     }
-    EntityFactory.entities.query(
-	function (response) {
-	    $scope.showProcessMessage = false;
-	    $scope.ents = response;
-	},
-	function (response) {
-	    console.log('Error found in controller while retrieving the entities ');
-	    $scope.processMessage = response.data;
-	    $scope.showProcessMessage = true;
-	}
-	);
 
-    $scope.showAddNewForm = function (isVisible) {
+    // Getting entities from the dabase
+    var retrieveOneEntity = function (entId) {
+        EntityFactory.entities.getOne({ entId: $scope.entId },
+        function (response) {
+            $scope.showProcessMessage = false;
+            console.log('Found entity and retrieved it :' + $scope.entId);
+            $scope.ent = response;
+        },
+        function (response) {
+            console.log('Error found in controller while retrieving the entity ');
+            $scope.processMessage = response.data;
+            $scope.showProcessMessage = true;
+        })
+    };
+
+    // Retrieving the entity
+    retrieveOneEntity($scope.entId);
+    $scope.showAddNewForm = function (isVisible, editMode) {
+        $scope.editMode = editMode;
         $scope.showProcessMessage = false;
         $scope.addNewFormIsVisible = isVisible;
+        if ($scope.editMode) {
+            $scope.newEnt = $scope.ent;
+        }
     }
 
-    $scope.addNewEntity = function () {
+    $scope.saveEntity = function () {
         $scope.processMessage = '';
         $scope.showProcessMessage = false;
-        EntityFactory.entities.save($scope.newEnt,
-			function (response) {
-			    console.log('new Entity Created id:' + 'response._id');
-			    EntityFactory.entities.query(
-				function (response) {
-				    $scope.ents = response;
-				},
-				function (response) {
-				    console.log('Error found in controller while retrieving the entities ');
-				}
-				);
-			},
-			function (response) {
-			    console.log('failed to create new entity');
-			}
-		);
+        if ($scope.editMode) { // existing entity is updated
+            EntityFactory.entities.update({ entId: $scope.newEnt._id, name: $scope.newEnt.name, url: $scope.newEnt.url, description: $scope.newEnt.description },
+                function (response) {
+                    if (response) {
+                        var id = response._id;
+                        console.log('Entity Saved -  id:' + id);
+                        $scope.showProcessMessage = false;
+                        $scope.processMessage = '';
+                        $state.go('app.entityDetails', { entId: id });
+                    }
+                },
+                function (response) {
+                    console.log('failed to save Changes to  entity  ');
+                    $scope.processMessage = 'failed to save change to entity ';
+                    $scope.showProcessMessage = true;
+                })
+        } else {    // new entity is inserted
+            EntityFactory.entities.save($scope.newEnt,
+                function (response) {
+                    //console.log('new Entity Created id:' + 'response._id');
+                    if (response) {
+                        $scope.editMode = false;
+                        var id = response._id;
+                        // redirecting to a page with the new entity id
+                        $state.go('app.entityDetails', { entId: id });
+                    }
+                },
+                function (response) {
+                    console.log('failed to create new entity');
+                }
+            );
+        }
         $scope.addNewFormIsVisible = false;
         $scope.newEnt = { name: '', url: '', description: '' };
 
     }
-
-    $scope.deleteEntity = function (entId) {
-        $scope.processMessage = 'Deleting entity';
-        $scope.showProcessMessage = true;
-        EntityFactory.entities.delete({ 'entId': entId },
-			function (response) {
-			    console.log('Entity Deleted id:' + 'response._id');
-			    EntityFactory.entities.query(
-				function (response) {
-				    $scope.ents = response;
-				},
-				function (response) {
-				    console.log('Error found in controller while deleting the entities ');
-				    $scope.processMessage = 'Error found in controller while deleting the entities ';
-				    $scope.showProcessMessage = true;
-				}
-				);
-			},
-			function (response) {
-			    console.log('failed to delete entity');
-			    $scope.processMessage = 'failed to delete entity  ';
-			    $scope.showProcessMessage = true;
-			})
-    };
 
     $scope.cancelAddNew = function () {
         $scope.processMessage = '';
         $scope.showProcessMessage = false;
         $scope.addNewFormIsVisible = false;
-        $scope.newEnt = { name: '', url: '', description: '' };
+        $scope.editRecord = false;
+        resetNewEntity();
     }
 }])
 .controller('ArticleController', ['$scope', 'ngDialog', '$localStorage', 'ArticleFactory', function ($scope, ngDialog, $localStorage, ArticleFactory) {
