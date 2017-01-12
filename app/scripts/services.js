@@ -112,7 +112,7 @@ angular.module('amcomanApp')
         $resource(baseURL + "users/register")
         .save(registerData,
            function(response) {
-              authFac.login({username:registerData.username, password:registerData.password, admin: admin});
+              authFac.login({username:registerData.username, password:registerData.password, admin: registerData.admin});
             if (registerData.rememberMe) {
                 $localStorage.storeObject('userinfo',
                     {username:registerData.username, password:registerData.password});
@@ -152,7 +152,19 @@ angular.module('amcomanApp')
     return authFac;
     
 }])
-.factory('OrgFactory', ['$resource', '$http', '$localStorage', '$rootScope', '$window', 'baseURL', 'ngDialog', function($resource, $http, $localStorage, $rootScope, $window, baseURL, ngDialog){
+
+.factory('feedbackFactory', ['$resource', 'baseURL', function ($resource, baseURL) {
+
+
+    return $resource(baseURL + "feedback/:id", null, {
+        'update': {
+            method: 'PUT'
+        }
+    });
+
+}])
+
+.factory('OrgFactory', ['$resource', '$http', '$localStorage', '$rootScope', '$window', 'baseURL', 'ngDialog', function ($resource, $http, $localStorage, $rootScope, $window, baseURL, ngDialog) {
     var orgFac = {};
     orgFac.orgs =  $resource(baseURL + "orgs/:orgId", { orgId: '@orgId' }, {
         'update': { method: 'PUT' },

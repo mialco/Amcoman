@@ -2,57 +2,6 @@
 
 angular.module('amcomanApp')
 
-.controller('MenuController', ['$scope', 'menuFactory', 'favoriteFactory', function ($scope, menuFactory, favoriteFactory) {
-
-    $scope.tab = 1;
-    $scope.filtText = '';
-    $scope.showDetails = false;
-    $scope.showFavorites = false;
-    $scope.showMenu = false;
-    $scope.message = "Loading ...";
-
-    menuFactory.query(
-        function (response) {
-            $scope.dishes = response;
-            $scope.showMenu = true;
-
-        },
-        function (response) {
-            $scope.message = "Error: " + response.status + " " + response.statusText;
-        });
-
-    $scope.select = function (setTab) {
-        $scope.tab = setTab;
-
-        if (setTab === 2) {
-            $scope.filtText = "appetizer";
-        } else if (setTab === 3) {
-            $scope.filtText = "mains";
-        } else if (setTab === 4) {
-            $scope.filtText = "dessert";
-        } else {
-            $scope.filtText = "";
-        }
-    };
-
-    $scope.isSelected = function (checkTab) {
-        return ($scope.tab === checkTab);
-    };
-
-    $scope.toggleDetails = function () {
-        $scope.showDetails = !$scope.showDetails;
-    };
-
-    $scope.toggleFavorites = function () {
-        $scope.showFavorites = !$scope.showFavorites;
-    };
-
-    $scope.addToFavorites = function (dishid) {
-        console.log('Add to favorites', dishid);
-        favoriteFactory.save({ _id: dishid });
-        $scope.showFavorites = !$scope.showFavorites;
-    };
-}])
 
 .controller('ContactController', ['$scope', 'feedbackFactory', function ($scope, feedbackFactory) {
 
@@ -78,7 +27,7 @@ angular.module('amcomanApp')
     $scope.sendFeedback = function () {
 
 
-        if ($scope.feedback.agree && ($scope.feedback.mychannel == "")) {
+        if ($scope.feedback.agree && ($scope.feedback.mychannel === "")) {
             $scope.invalidChannelSelection = true;
         } else {
             $scope.invalidChannelSelection = false;
@@ -96,45 +45,6 @@ angular.module('amcomanApp')
     };
 }])
 
-.controller('DishDetailController', ['$scope', '$state', '$stateParams', 'menuFactory', 'commentFactory', function ($scope, $state, $stateParams, menuFactory, commentFactory) {
-
-    $scope.dish = {};
-    $scope.showDish = false;
-    $scope.message = "Loading ...";
-
-    $scope.dish = menuFactory.get({
-        id: $stateParams.id
-    })
-        .$promise.then(
-            function (response) {
-                $scope.dish = response;
-                $scope.showDish = true;
-            },
-            function (response) {
-                $scope.message = "Error: " + response.status + " " + response.statusText;
-            }
-        );
-
-    $scope.mycomment = {
-        rating: 5,
-        comment: ""
-    };
-
-    $scope.submitComment = function () {
-
-        commentFactory.save({ id: $stateParams.id }, $scope.mycomment);
-
-        $state.go($state.current, {}, { reload: true });
-
-        $scope.commentForm.$setPristine();
-
-        $scope.mycomment = {
-            rating: 5,
-            comment: ""
-        };
-    }
-}])
-
 // implement the IndexController and About Controller here
 
 .controller('HomeController', ['$scope', 'menuFactory', function ($scope, menuFactory, promotionFactory) {
@@ -148,58 +58,6 @@ angular.module('amcomanApp')
 
     $scope.leaders = {};
 
-}])
-
-.controller('FavoriteController', ['$scope', '$state', 'favoriteFactory', function ($scope, $state, favoriteFactory) {
-
-    $scope.tab = 1;
-    $scope.filtText = '';
-    $scope.showDetails = false;
-    $scope.showDelete = false;
-    $scope.showMenu = false;
-    $scope.message = "Loading ...";
-
-    favoriteFactory.query(
-        function (response) {
-            $scope.dishes = response.dishes;
-            $scope.showMenu = true;
-        },
-        function (response) {
-            $scope.message = "Error: " + response.status + " " + response.statusText;
-        });
-
-    $scope.select = function (setTab) {
-        $scope.tab = setTab;
-
-        if (setTab === 2) {
-            $scope.filtText = "appetizer";
-        } else if (setTab === 3) {
-            $scope.filtText = "mains";
-        } else if (setTab === 4) {
-            $scope.filtText = "dessert";
-        } else {
-            $scope.filtText = "";
-        }
-    };
-
-    $scope.isSelected = function (checkTab) {
-        return ($scope.tab === checkTab);
-    };
-
-    $scope.toggleDetails = function () {
-        $scope.showDetails = !$scope.showDetails;
-    };
-
-    $scope.toggleDelete = function () {
-        $scope.showDelete = !$scope.showDelete;
-    };
-
-    $scope.deleteFavorite = function (dishid) {
-        console.log('Delete favorites', dishid);
-        favoriteFactory.delete({ id: dishid });
-        $scope.showDelete = !$scope.showDelete;
-        $state.go($state.current, {}, { reload: true });
-    };
 }])
 
 .controller('HeaderController', ['$scope', '$state', '$rootScope', 'ngDialog', 'AuthFactory', function ($scope, $state, $rootScope, ngDialog, AuthFactory) {
@@ -308,7 +166,7 @@ angular.module('amcomanApp')
     $scope.showAddNewForm = function (isVisible) {
         $scope.showProcessMessage = false;
         $scope.addNewFormIsVisible = isVisible;
-    }
+    };
 
     $scope.addNewOrg = function () {
         $scope.processMessage = '';
@@ -332,14 +190,14 @@ angular.module('amcomanApp')
 			}
 		);
         $scope.addNewFormIsVisible = false;
-        $scope.newOrg = { organizationName: '', contactName: '', contactEmail: '', contactPhone: '' }
+        $scope.newOrg = { organizationName: '', contactName: '', contactEmail: '', contactPhone: '' };
     };
 
     $scope.cancelAddNew = function () {
         $scope.processMessage = '';
         $scope.showProcessMessage = false;
         $scope.addNewFormIsVisible = false;
-        $scope.newOrg = { organizationName: '', contactName: '', contactEmail: '', contactPhone: '' }
+        $scope.newOrg = { organizationName: '', contactName: '', contactEmail: '', contactPhone: '' };
     };
 
     $scope.deleteOrg = function (orgId) {
@@ -365,7 +223,7 @@ angular.module('amcomanApp')
 			    console.log('failed to delete organization');
 			    $scope.processMessage = 'failed to delete organization  ';
 			    $scope.showProcessMessage = true;
-			})
+			});
     };
 
     $scope.editOrg = function (org) {
@@ -395,7 +253,7 @@ angular.module('amcomanApp')
 			    console.log('failed to save Changes to  organization  ');
 			    $scope.processMessage = 'failed to save change to organization ';
 			    $scope.showProcessMessage = true;
-			})
+			});
 
         $scope.orgs[lineId].edit = false;
     };
@@ -473,7 +331,7 @@ angular.module('amcomanApp')
             $scope.availableEntities = response;
             $scope.availableEntitiesNeedsRefresh = false;
         }, function (response) {
-            $scopeAvailableEntites = [];
+            $scopeAvailableEntities = [];
             $scope.showProcessMessage = true;
             $scope.processMessage = "Failed to retrieve entities for this organization";
         });
@@ -606,10 +464,10 @@ angular.module('amcomanApp')
 
     $scope.cancelAddingEntities = function () {
         $scope.showAvailableEntities = false;
-    }
+    };
 
     function resetNewOrg() {
-        $scope.newOrg = { organizationName: '', contactName: '', contactEmail: '', contactPhone: '' }
+        $scope.newOrg = { organizationName: '', contactName: '', contactEmail: '', contactPhone: '' };
     }
 
     function configureEntities() {
@@ -632,7 +490,7 @@ angular.module('amcomanApp')
     //Creates a new instance of entity
     var resetNewEntity = function () {
         $scope.newEnt = { name: '', url: '', description: '' };
-    }
+    };
 
     // Used after retrieving the data from the server to add additional fields
     // Used by the UI to control the manipulation of individual records
@@ -644,7 +502,7 @@ angular.module('amcomanApp')
                 items[j].lineId = j;
             }
         }
-    }
+    };
 
 
     resetNewEntity();
@@ -667,7 +525,7 @@ angular.module('amcomanApp')
     $scope.showAddNewForm = function (isVisible) {
         $scope.showProcessMessage = false;
         $scope.addNewFormIsVisible = isVisible;
-    }
+    };
 
     // using the entity factory we are adding a new entity to the database, then we are retrieving all the entities again
     $scope.addNewEntity = function () {
@@ -694,7 +552,7 @@ angular.module('amcomanApp')
         $scope.addNewFormIsVisible = false;
         $scope.newEnt = { name: '', url: '', description: '' };
 
-    }
+    };
 
     // Using the entity factory, we are deleting an entity 
     // Then we are retrieving the entity records form the database
@@ -723,7 +581,7 @@ angular.module('amcomanApp')
 			    console.log('failed to delete entity');
 			    $scope.processMessage = 'failed to delete entity  ';
 			    $scope.showProcessMessage = true;
-			})
+			});
     };
 
     // When the Add New form is thisplay , this will set the variales to hide the form and reset the new entity object
@@ -732,7 +590,7 @@ angular.module('amcomanApp')
         $scope.showProcessMessage = false;
         $scope.addNewFormIsVisible = false;
         $scope.newEnt = { name: '', url: '', description: '' };
-    }
+    };
 
     // Prepares the line for editing by setting the boolean edit for the respective line
     // It is invoked by the edit button
@@ -766,8 +624,8 @@ angular.module('amcomanApp')
 			    console.log('failed to save Changes to  entity  ');
 			    $scope.processMessage = 'failed to save change to entity ';
 			    $scope.showProcessMessage = true;
-			})
-    }
+			});
+    };
 
     //Unsets the edit flag for the respecive line
     // this way hiding thr edit elements of the line
@@ -794,7 +652,7 @@ angular.module('amcomanApp')
 
     var resetNewEntity = function () {
         $scope.newEnt = { name: '', url: '', description: '' };
-    }
+    };
 
     // Getting entities from the dabase
     var retrieveOneEntity = function (entId) {
@@ -808,7 +666,7 @@ angular.module('amcomanApp')
             console.log('Error found in controller while retrieving the entity ');
             $scope.processMessage = response.data;
             $scope.showProcessMessage = true;
-        })
+        });
     };
 
     // Retrieving the entity
@@ -820,7 +678,7 @@ angular.module('amcomanApp')
         if ($scope.editMode) {
             $scope.newEnt = $scope.ent;
         }
-    }
+    };
 
     $scope.saveEntity = function () {
         $scope.processMessage = '';
@@ -840,7 +698,7 @@ angular.module('amcomanApp')
                     console.log('failed to save Changes to  entity  ');
                     $scope.processMessage = 'failed to save change to entity ';
                     $scope.showProcessMessage = true;
-                })
+                });
         } else {    // new entity is inserted
             EntityFactory.entities.save($scope.newEnt,
                 function (response) {
@@ -860,7 +718,7 @@ angular.module('amcomanApp')
         $scope.addNewFormIsVisible = false;
         $scope.newEnt = { name: '', url: '', description: '' };
 
-    }
+    };
 
     $scope.cancelAddNew = function () {
         $scope.processMessage = '';
@@ -868,7 +726,7 @@ angular.module('amcomanApp')
         $scope.addNewFormIsVisible = false;
         $scope.editRecord = false;
         resetNewEntity();
-    }
+    };
 }])
 .controller('ArticleController', ['$scope', 'ngDialog', '$localStorage', 'ArticleFactory', function ($scope, ngDialog, $localStorage, ArticleFactory) {
     $scope.arts = {};
@@ -897,7 +755,7 @@ angular.module('amcomanApp')
     $scope.showAddNewForm = function (isVisible) {
         $scope.showProcessMessage = false;
         $scope.addNewFormIsVisible = isVisible;
-    }
+    };
 
     $scope.addNewArticle = function () {
         $scope.processMessage = '';
@@ -921,7 +779,7 @@ angular.module('amcomanApp')
         $scope.addNewFormIsVisible = false;
         $scope.newArt = { name: '', link: '', description: '', longDescription: '', isActive: true };
 
-    }
+    };
 
     $scope.deleteArticle = function (artId) {
         $scope.processMessage = 'Deleting article';
@@ -944,7 +802,7 @@ angular.module('amcomanApp')
 			    console.log('failed to delete article');
 			    $scope.processMessage = 'failed to delete article  ';
 			    $scope.showProcessMessage = true;
-			})
+			});
     };
 
     $scope.editArticle = function (artId, lineId) {
@@ -972,7 +830,7 @@ angular.module('amcomanApp')
 			    console.log('failed to save Changes to  article ');
 			    $scope.processMessage = 'failed to save change to article  ';
 			    $scope.showProcessMessage = true;
-			})
+			});
 
         $scope.arts[lineId].edit = false;
     };
@@ -986,7 +844,7 @@ angular.module('amcomanApp')
         $scope.showProcessMessage = false;
         $scope.addNewFormIsVisible = false;
         $scope.newEnt = { name: '', url: '', description: '' };
-    }
+    };
 }])
 
 ;
