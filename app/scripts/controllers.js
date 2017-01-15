@@ -142,7 +142,7 @@ angular.module('amcomanApp')
 
     };
 }])
-.controller('OrganizationController', ['$scope', 'ngDialog', '$localStorage', 'OrgFactory', function ($scope, ngDialog, $localStorage, OrgFactory) {
+.controller('OrganizationController', ['$scope',  'OrgFactory', function ($scope,  OrgFactory) {
     $scope.orgs = {};
     $scope.addNewFormIsVisible = false;
     $scope.processMessage = '';
@@ -276,7 +276,7 @@ angular.module('amcomanApp')
     }
 
 }])
-.controller('OrganizationDetailController', ['$scope', '$stateParams', 'ngDialog', '$localStorage', 'OrgFactory', 'EntityFactory', function ($scope, $stateParams, ngDialog, $localStorage, OrgFactory, EntityFactory) {
+.controller('OrganizationDetailController', ['$scope', '$stateParams', 'OrgFactory', 'EntityFactory', function ($scope, $stateParams, OrgFactory, EntityFactory) {
     $scope.org = {};
     $scope.addNewFormIsVisible = false;
     $scope.editCurrent = false;
@@ -479,7 +479,7 @@ angular.module('amcomanApp')
         $scope.entitiesCount = entitiesCount;
     }
 }])
-.controller('EntityController', ['$scope', 'ngDialog', '$localStorage', 'EntityFactory', function ($scope, ngDialog, $localStorage, EntityFactory) {
+.controller('EntityController', ['$scope', 'EntityFactory', function ($scope, EntityFactory) {
     $scope.ents = {};
     $scope.addNewFormIsVisible = false;
     $scope.processMessage = '';
@@ -728,7 +728,7 @@ angular.module('amcomanApp')
         resetNewEntity();
     };
 }])
-.controller('ArticleController', ['$scope', 'ngDialog', '$localStorage', 'ArticleFactory', function ($scope, ngDialog, $localStorage, ArticleFactory) {
+.controller('ArticleController', ['$scope', 'ArticleFactory', function ($scope, ArticleFactory) {
     $scope.arts = {};
     $scope.addNewFormIsVisible = false;
     $scope.processMessage = '';
